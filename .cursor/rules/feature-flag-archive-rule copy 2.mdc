@@ -8,7 +8,7 @@ tags: ["cursor-rule", "launchdarkly", "feature-flag", "refactoring", "java", "re
 
 When archiving any LaunchDarkly flag, apply the following rules:
 
-1. Determine the final evaluated value:sdfsdf
+1. Determine the final evaluated value:sdfdfdfdfdfsdf
    - final = ON  → treat flag as always true.
    - final = OFF → treat flag as always false.
 
