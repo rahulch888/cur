@@ -1,0 +1,60 @@
+---
+alwaysApply: false
+title: "Archive LaunchDarkly Feature Flags (Java + React)"
+description: "Cursor rule for removing a LaunchDarkly feature flag, simplifying conditions, and cleaning Java + React codebases after the flag is permanently ON or OFF."
+tags: ["cursor-rule", "launchdarkly", "feature-flag", "refactoring", "java", "react", "cleanup"]
+---
+### RULE: Archive a LaunchDarkly Feature Flag (Java + React)
+
+When archiving any LaunchDarkly flag, apply the following rules:
+
+1. Determine the final evaluated value:
+   - final = ON  → treat flag as always true.
+   - final = OFF → treat flag as always false.
+
+2. Remove flag definition from Java backend:
+   - Delete method from FeatureFlag interface.
+   - Delete overridden method from implementation.
+   - Remove LD variation call and any fields used only for this flag.
+
+3. Replace all Java usages:
+
+   3.1 If/Else:
+       if (flag) { A } else { B }
+       - final = ON  → keep A only.
+       - final = OFF → keep B only.
+
+   3.2 Simple If:
+       if (flag) { A }
+       - final = ON  → inline A without condition.
+       - final = OFF → remove A entirely.
+
+   3.3 Negated:
+       if (!flag) { A } else { B }
+       - final = ON  → keep B.
+       - final = OFF → keep A.
+
+   3.4 Ternary:
+       flag ? A : B
+       - final = ON  → replace with A.
+       - final = OFF → replace with B.
+
+   3.5 Logical:
+       flag && X   → simplify to (true && X) or (false && X)
+       flag || X   → simplify to (true || X) or (false || X)
+
+4. Remove React frontend references:
+   - Remove flag from feature flag hook/context/store.
+   - Remove from TS interface or JS object.
+   - Apply same simplification rules for JSX:
+     - flag ? <A/> : <B/>
+     - flag && <A/>
+     - !flag && <A/>
+
+5. Do NOT remove:
+   - LD client initialization
+   - Remaining flags
+   - Environment variables for other flags
+
+6. Add:
+   // <flag-name> archived; condition simplified (date)
